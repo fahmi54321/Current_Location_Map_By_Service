@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "53131682936",
+    "project_id": "current-location-by-service",
+    "storage_bucket": "current-location-by-service.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53131682936:android:c2435c471cad1b0438798d",
+        "android_client_info": {
+          "package_name": "com.android.currentlocationmapbyservice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "53131682936-irfura8sedopjk48bnpnau0rpg7flil3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhVSW6LfF2h9DPRcOYoGgF9WO0wkMtCUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "53131682936-irfura8sedopjk48bnpnau0rpg7flil3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
