@@ -114,12 +114,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         onlineRef = FirebaseDatabase.getInstance().getReference().child(".info/connected")
 
 
+        //todo fix permission first launch
+        permissionLocation()
+
         //todo 4 current location
         buildLocationRequest()
         buildLocationCallback()
 
         //todo 7
         updateLocation()
+    }
+
+    private fun permissionLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this@MapsActivity,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this@MapsActivity,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            //Location Permission already granted
+            Toast.makeText(this@MapsActivity, "Permission granted", Toast.LENGTH_SHORT)
+                .show()
+            return
+        }else{
+            checkLocationPermission()
+        }
     }
 
     //todo 8
