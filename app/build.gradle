@@ -55,6 +55,11 @@ dependencies {
     //todo 1 login
     implementation 'com.firebaseui:firebase-ui-auth:7.1.0'
 
+    //todo 1 register
+    implementation platform('com.google.firebase:firebase-bom:26.3.0')
+    implementation 'com.google.firebase:firebase-database-ktx'
+
+
 
     //firebase database
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
