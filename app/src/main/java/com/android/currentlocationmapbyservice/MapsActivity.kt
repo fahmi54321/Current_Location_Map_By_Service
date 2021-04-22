@@ -5,29 +5,36 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
+import com.firebase.geofire.GeoFire
+import com.firebase.geofire.GeoLocation
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import java.io.IOException
+import java.util.*
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -46,12 +53,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val MY_PERMISSIONS_REQUEST_LOCATION = 99
     }
 
+    //todo 10
+    private lateinit var onlineRef:DatabaseReference
+    private var currentUserRef:DatabaseReference?=null
+    private lateinit var driverLocationRef: DatabaseReference
+    private lateinit var geoFire: GeoFire
+    private var onlineValueEventListener = object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            if (snapshot.exists() && currentUserRef != null) {
+                currentUserRef?.onDisconnect()?.removeValue()
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Snackbar.make(mapFragment.requireView(), error.message, Snackbar.LENGTH_LONG).show()
+        }
+
+    }
+
     //todo 5
     override fun onDestroy() {
 
         fusedLocationProviderClient?.removeLocationUpdates(locationCallback)
 
+        //todo 11
+        geoFire.removeLocation(FirebaseAuth.getInstance().currentUser?.uid)
+        onlineRef.removeEventListener(onlineValueEventListener)
+
         super.onDestroy()
+    }
+
+    //todo 12
+    override fun onResume() {
+        super.onResume()
+        registerOnlineSystem()
+    }
+
+    //todo 13
+    private fun registerOnlineSystem() {
+        onlineRef.addValueEventListener(onlineValueEventListener)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,9 +109,40 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun init() {
+
+        //todo 14
+        onlineRef = FirebaseDatabase.getInstance().getReference().child(".info/connected")
+
+
         //todo 4 current location
         buildLocationRequest()
         buildLocationCallback()
+
+        //todo 7
+        updateLocation()
+    }
+
+    //todo 8
+    private fun updateLocation() {
+        if (fusedLocationProviderClient==null){
+            fusedLocationProviderClient =LocationServices.getFusedLocationProviderClient(this)
+            if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                //Location Permission already granted
+                Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show()
+            } else {
+                //Request Location Permission
+                checkLocationPermission()
+            }
+            fusedLocationProviderClient?.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.myLooper()
+            )
+        }
     }
 
     private fun buildLocationCallback() {
@@ -85,6 +156,81 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         locationResults?.lastLocation?.longitude ?: 0.0
                     )
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newPos, 18f))
+
+                    //todo 15
+                    val geoCoder = Geocoder(this@MapsActivity, Locale.getDefault())
+                    val addressList: List<Address>?
+                    try {
+                        addressList = geoCoder.getFromLocation(
+                                locationResults?.lastLocation?.latitude?:0.0,
+                                locationResults?.lastLocation?.longitude?:0.0,
+                                1
+                        )
+                        val cityName = addressList[0].locality
+                        driverLocationRef =
+                                FirebaseDatabase.getInstance()
+                                        .getReference(Common.DRIVER_LOCATION_REFERENCE)
+                                        .child(cityName)
+                        currentUserRef = driverLocationRef.child(
+                                FirebaseAuth.getInstance().currentUser!!.uid
+                        )
+                        geoFire = GeoFire(driverLocationRef)
+
+                        //update location
+                        geoFire.setLocation(
+                                FirebaseAuth.getInstance().currentUser!!.uid,
+                                GeoLocation(
+                                        locationResults?.lastLocation?.latitude?:0.0,
+                                        locationResults?.lastLocation?.longitude?:0.0
+                                )
+                        ) { key: String, error: DatabaseError? ->
+                            if (error != null) {
+                                Snackbar.make(
+                                        mapFragment.requireView(),
+                                        error.message,
+                                        Snackbar.LENGTH_LONG
+                                ).show()
+                            } else {
+                                Snackbar.make(
+                                        mapFragment.requireView(),
+                                        "You are online",
+                                        Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                        registerOnlineSystem()
+
+                        //modifikasi rule
+//                    "MotorLocations" : {
+//                            "$uid" : {
+//                            ".read" : "auth !=null",
+//                            ".write" : "$auth != null"
+//                        }
+//                    },
+
+                    } catch (e: IOException) {
+                        Snackbar.make(mapFragment.requireView(), e.message?:"", Snackbar.LENGTH_SHORT).show()
+                    }
+
+                    //setting ulang rules realtime database di firebase (testing aplikasi)
+                    // we will let info can be read by anyone (with authenticated) but only write by theirself
+                    /*{
+                    "rules": {
+                    "MotorInfo" : {
+                            "$uid" : {
+                                ".read" : "auth !=null",
+                                ".write" : "$uid == auth.uid"
+                            }
+                        }
+                    },
+                    "MotorLocations" : {
+                            "$uid" : {
+                            ".read" : "auth !=null",
+                            ".write" : "$uid == auth.uid"
+                        }
+                    }
+                }*/
 
                 }
             }
@@ -113,7 +259,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         "Permission" + p0?.permissionName,
                         Toast.LENGTH_SHORT
                     ).show()
-
 
                     if (ActivityCompat.checkSelfPermission(
                             this@MapsActivity,
@@ -157,6 +302,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
                     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
                     params.bottomMargin = 50
+
+                    //todo 9
+                    buildLocationRequest()
+                    buildLocationCallback()
+                    updateLocation()
 
                 }
 
