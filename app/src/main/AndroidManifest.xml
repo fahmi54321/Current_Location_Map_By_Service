@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.currentlocationmapbyservice">
+
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -14,7 +15,7 @@
        Android 10 (API level 29) and higher.
     -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"></uses-permission>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -23,13 +24,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CurrentLocationMapByService">
-        <activity android:name=".MainActivityServiceMap">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -42,19 +37,27 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <!-- todo 2 splashscreen -->
+        <activity android:name=".MainActivityServiceMap">
+
+        </activity> <!-- todo 2 splashscreen -->
         <activity
             android:name=".SplashScreenActivity"
-            android:theme="@style/SplashTheme" />
+            android:theme="@style/SplashTheme" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
 
         <service
             android:name=".Service.MyMapService"
-            android:foregroundServiceType="location"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true"
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>

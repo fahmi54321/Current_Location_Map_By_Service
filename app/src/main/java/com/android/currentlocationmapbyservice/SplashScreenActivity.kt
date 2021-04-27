@@ -183,7 +183,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
     private fun gotoMapsActivity(model: DriverInfoModel?) {
         Common.currentUser = model
-        startActivity(Intent(this, MapsActivity::class.java))
+        startActivity(Intent(this, MainActivityServiceMap::class.java))
         finish()
     }
 
