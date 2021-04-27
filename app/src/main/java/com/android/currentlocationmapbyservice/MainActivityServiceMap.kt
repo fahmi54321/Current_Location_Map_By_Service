@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.util.Log
 import android.widget.Toast
 import com.android.currentlocationmapbyservice.Model.MapLocation
 import com.android.currentlocationmapbyservice.Service.MyMapService
@@ -41,7 +42,8 @@ class MainActivityServiceMap : AppCompatActivity(), SharedPreferences.OnSharedPr
     fun onBackgroundLocationRetrive(event: MapLocation) {
 
         if (event.location != null) {
-            Toast.makeText(this, Common.getLocationText(event.location), Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, Common.getLocationText(event.location), Toast.LENGTH_SHORT).show()
+            Log.e("map back","lat : ${event.location.latitude} long : ${event.location.longitude}")
         }
 
     }

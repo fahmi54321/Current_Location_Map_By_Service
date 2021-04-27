@@ -57,6 +57,7 @@ class MyMapService : Service() {
             .setPriority(Notification.PRIORITY_HIGH)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setTicker(text)
+            .setSound(null)
             .setWhen(System.currentTimeMillis())
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
             builder.setChannelId(CHANNEL_ID)
@@ -83,6 +84,8 @@ class MyMapService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val name = packageName
             val mChannel = NotificationChannel(CHANNEL_ID,name,NotificationManager.IMPORTANCE_DEFAULT)
+            mChannel.setSound(null,null)
+            mChannel.enableVibration(false)
             mNotificationManager?.createNotificationChannel(mChannel)
         }
      }
@@ -138,6 +141,7 @@ class MyMapService : Service() {
         mLocation = lastLocation
         EventBus.getDefault().postSticky(MapLocation(mLocation!!))
         if (serviceIsRunningInForeground(this)){
+            Log.e("map back","lat : ${mLocation?.latitude} long : ${mLocation?.longitude}")
             mNotificationManager?.notify(NOTIFICATION_ID,notification)
         }
     }
