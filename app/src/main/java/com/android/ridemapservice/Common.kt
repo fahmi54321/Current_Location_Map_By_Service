@@ -3,7 +3,7 @@ package com.android.ridemapservice
 import android.content.Context
 import android.location.Location
 import android.preference.PreferenceManager
-import com.android.ridemapservice.Model.DriverInfoModel
+import com.android.ridemapservice.Model.RiderInfoModel
 import java.text.DateFormat
 import java.util.*
 
@@ -36,7 +36,7 @@ object Common {
     }
 
     val KEY_REQUEST_LOCATION_UPDATE = "requesting_location_update"
-    var currentUser: DriverInfoModel? = null
-    val DRIVER_INFO_REFERENCE: String = "DriverInfo"
-    val DRIVER_LOCATION_REFERENCE: String = "DriverLocations"
+    var currentUser: RiderInfoModel? = null
+    val RIDER_INFO_REFERENCE: String = "RiderInfo"
+    val RIDER_LOCATION_REFERENCE: String = "RiderLocations"
 }

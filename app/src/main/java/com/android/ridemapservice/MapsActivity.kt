@@ -189,7 +189,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         val cityName = addressList[0].locality
                         driverLocationRef =
                                 FirebaseDatabase.getInstance()
-                                        .getReference(Common.DRIVER_LOCATION_REFERENCE)
+                                        .getReference(Common.RIDER_LOCATION_REFERENCE)
                                         .child(cityName)
                         currentUserRef = driverLocationRef.child(
                                 FirebaseAuth.getInstance().currentUser!!.uid

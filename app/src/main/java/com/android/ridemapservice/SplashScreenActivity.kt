@@ -11,7 +11,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
-import com.android.ridemapservice.Model.DriverInfoModel
+import com.android.ridemapservice.Model.RiderInfoModel
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -75,7 +75,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
         //todo 3 register
         database = FirebaseDatabase.getInstance()
-        driverInfoRef = database.getReference(Common.DRIVER_INFO_REFERENCE)
+        driverInfoRef = database.getReference(Common.RIDER_INFO_REFERENCE)
 
         providers = Arrays.asList(
             AuthUI.IdpConfig.PhoneBuilder().build(),
@@ -100,7 +100,7 @@ class SplashScreenActivity : AppCompatActivity() {
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
-                        val model = snapshot.getValue(DriverInfoModel::class.java)
+                        val model = snapshot.getValue(RiderInfoModel::class.java)
                         gotoMapsActivity(model)
                     } else {
                         showRegisterLayout()
@@ -150,7 +150,7 @@ class SplashScreenActivity : AppCompatActivity() {
                 return@setOnClickListener
             }else{
 
-                var model = DriverInfoModel()
+                var model = RiderInfoModel()
                 model.firstName = firstName.text.toString()
                 model.lastName = lastName.text.toString()
                 model.phoneNumber = phoneNumber.text.toString()
@@ -181,7 +181,7 @@ class SplashScreenActivity : AppCompatActivity() {
 //            }
     }
 
-    private fun gotoMapsActivity(model: DriverInfoModel?) {
+    private fun gotoMapsActivity(model: RiderInfoModel?) {
         Common.currentUser = model
         startActivity(Intent(this, MainActivityServiceMap::class.java))
         finish()

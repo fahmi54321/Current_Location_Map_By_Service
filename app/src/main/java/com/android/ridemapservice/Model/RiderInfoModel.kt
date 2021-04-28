@@ -1,6 +1,6 @@
 package com.android.ridemapservice.Model
 
-class DriverInfoModel {
+class RiderInfoModel {
     var firstName: String = ""
     var lastName: String = ""
     var phoneNumber: String = ""

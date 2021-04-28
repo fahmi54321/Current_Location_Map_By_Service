@@ -42,7 +42,7 @@ class MyMapService : Service() {
 
     private lateinit var onlineRef: DatabaseReference
     private var currentUserRef: DatabaseReference?=null
-    private lateinit var driverLocationRef: DatabaseReference
+    private lateinit var riderLocationRef: DatabaseReference
     private lateinit var geoFire: GeoFire
     private var onlineValueEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -180,14 +180,14 @@ class MyMapService : Service() {
                     1
                 )
                 val cityName = addressList[0].locality
-                driverLocationRef =
+                riderLocationRef =
                     FirebaseDatabase.getInstance()
-                        .getReference(Common.DRIVER_LOCATION_REFERENCE)
+                        .getReference(Common.RIDER_LOCATION_REFERENCE)
                         .child(cityName)
-                currentUserRef = driverLocationRef.child(
+                currentUserRef = riderLocationRef.child(
                     FirebaseAuth.getInstance().currentUser!!.uid
                 )
-                geoFire = GeoFire(driverLocationRef)
+                geoFire = GeoFire(riderLocationRef)
 
                 //update location
                 geoFire.setLocation(
