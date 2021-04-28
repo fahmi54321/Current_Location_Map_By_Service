@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Current Location Map By Service</string>
+    <string name="app_name">Ride Map Service</string>
     <string name="title_activity_maps">Map</string>
     <string name="sign_in_with_phone">Sign In With Phone</string>
     <string name="register_text">Register</string>

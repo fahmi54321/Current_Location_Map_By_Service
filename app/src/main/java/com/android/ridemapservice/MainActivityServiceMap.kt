@@ -1,4 +1,4 @@
-package com.android.currentlocationmapbyservice
+package com.android.ridemapservice
 
 import android.Manifest
 import android.app.AlertDialog
@@ -17,8 +17,8 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.android.currentlocationmapbyservice.Model.MapLocation
-import com.android.currentlocationmapbyservice.Service.MyMapService
+import com.android.ridemapservice.Model.MapLocation
+import com.android.ridemapservice.Service.MyMapService
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -27,7 +27,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*

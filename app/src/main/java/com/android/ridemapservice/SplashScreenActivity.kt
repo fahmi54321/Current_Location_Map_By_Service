@@ -1,4 +1,4 @@
-package com.android.currentlocationmapbyservice
+package com.android.ridemapservice
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -11,7 +11,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
-import com.android.currentlocationmapbyservice.Model.DriverInfoModel
+import com.android.ridemapservice.Model.DriverInfoModel
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse

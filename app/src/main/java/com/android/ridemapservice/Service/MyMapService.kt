@@ -1,4 +1,4 @@
-package com.android.currentlocationmapbyservice.Service
+package com.android.ridemapservice.Service
 
 import android.app.*
 import android.content.Context
@@ -10,18 +10,16 @@ import android.location.Location
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.android.currentlocationmapbyservice.Common
-import com.android.currentlocationmapbyservice.Model.MapLocation
-import com.android.currentlocationmapbyservice.R
+import com.android.ridemapservice.Common
+import com.android.ridemapservice.Model.MapLocation
+import com.android.ridemapservice.R
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.*
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import org.greenrobot.eventbus.EventBus
 import java.io.IOException
-import java.security.Security
 import java.util.*
 
 class MyMapService : Service() {

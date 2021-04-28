@@ -1,4 +1,4 @@
-package com.android.currentlocationmapbyservice.Model
+package com.android.ridemapservice.Model
 
 import android.location.Location
 

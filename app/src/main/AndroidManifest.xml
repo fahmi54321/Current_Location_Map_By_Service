@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.currentlocationmapbyservice">
+    package="com.android.ridemapservice">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -37,11 +37,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivityServiceMap">
+        <activity android:name="com.android.ridemapservice.MainActivityServiceMap">
 
         </activity> <!-- todo 2 splashscreen -->
         <activity
-            android:name=".SplashScreenActivity"
+            android:name="com.android.ridemapservice.SplashScreenActivity"
             android:theme="@style/SplashTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,11 +50,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MapsActivity"
+            android:name="com.android.ridemapservice.MapsActivity"
             android:label="@string/title_activity_maps" />
 
         <service
-            android:name=".Service.MyMapService"
+            android:name="com.android.ridemapservice.Service.MyMapService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location" />

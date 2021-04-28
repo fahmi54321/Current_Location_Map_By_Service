@@ -1,9 +1,9 @@
-package com.android.currentlocationmapbyservice
+package com.android.ridemapservice
 
 import android.content.Context
 import android.location.Location
 import android.preference.PreferenceManager
-import com.android.currentlocationmapbyservice.Model.DriverInfoModel
+import com.android.ridemapservice.Model.DriverInfoModel
 import java.text.DateFormat
 import java.util.*
 

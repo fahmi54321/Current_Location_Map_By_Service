@@ -1,4 +1,4 @@
-package com.android.currentlocationmapbyservice
+package com.android.ridemapservice
 
 import org.junit.Test
 
