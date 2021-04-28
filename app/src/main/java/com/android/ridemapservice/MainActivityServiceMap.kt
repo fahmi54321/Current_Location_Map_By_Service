@@ -17,6 +17,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.android.ridemapservice.MapsActivity.Companion.MY_PERMISSIONS_REQUEST_LOCATION
 import com.android.ridemapservice.Model.MapLocation
 import com.android.ridemapservice.Service.MyMapService
 import com.firebase.geofire.GeoFire
@@ -306,52 +307,54 @@ class MainActivityServiceMap : AppCompatActivity(),
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             if (!checkSinglePermission(Manifest.permission.ACCESS_FINE_LOCATION) ||
-                !checkSinglePermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    !checkSinglePermission(Manifest.permission.ACCESS_COARSE_LOCATION) ||
+                    !checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) ||
+                    !checkSinglePermission(Manifest.permission.FOREGROUND_SERVICE)
             ) {
                 val permList = arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.FOREGROUND_SERVICE,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                        Manifest.permission.FOREGROUND_SERVICE
                 )
-                requestPermissions(permList, MapsActivity.MY_PERMISSIONS_REQUEST_LOCATION)
+                requestPermissions(permList, MY_PERMISSIONS_REQUEST_LOCATION)
             }
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (checkSinglePermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
-                checkSinglePermission(Manifest.permission.ACCESS_COARSE_LOCATION) &&
-                checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) &&
-                checkSinglePermission(Manifest.permission.FOREGROUND_SERVICE)
+                    checkSinglePermission(Manifest.permission.ACCESS_COARSE_LOCATION) &&
+                    checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) &&
+                    checkSinglePermission(Manifest.permission.FOREGROUND_SERVICE)
             ) return
             val permList = arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.FOREGROUND_SERVICE
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                    Manifest.permission.FOREGROUND_SERVICE
             )
-            requestPermissions(permList, MapsActivity.MY_PERMISSIONS_REQUEST_LOCATION)
+            requestPermissions(permList, MY_PERMISSIONS_REQUEST_LOCATION)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (checkSinglePermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) return
             AlertDialog.Builder(this)
-                .setTitle("Location Permission Needed")
-                .setMessage("This app needs the Location permission, please accept to use location functionality")
-                .setPositiveButton(
-                    "OK"
-                ) { _, _ ->
-                    //Prompt the user once explanation has been shown
-                    ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                        MapsActivity.MY_PERMISSIONS_REQUEST_LOCATION
-                    )
-                }
-                .create()
-                .show()
+                    .setTitle("Location Permission Needed")
+                    .setMessage("This app needs the Location permission, please accept to use location functionality")
+                    .setPositiveButton(
+                            "OK"
+                    ) { _, _ ->
+                        //Prompt the user once explanation has been shown
+                        ActivityCompat.requestPermissions(
+                                this,
+                                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                                MapsActivity.MY_PERMISSIONS_REQUEST_LOCATION
+                        )
+                    }
+                    .create()
+                    .show()
         } else {
             ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                MapsActivity.MY_PERMISSIONS_REQUEST_LOCATION
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    MapsActivity.MY_PERMISSIONS_REQUEST_LOCATION
             )
         }
     }
