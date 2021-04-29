@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import com.android.ridemapservice.MapsActivity.Companion.MY_PERMISSIONS_REQUEST_LOCATION
 import com.android.ridemapservice.Model.MapLocation
 import com.android.ridemapservice.Service.MyMapService
+import com.android.ridemapservice.Utils.Common
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.FusedLocationProviderClient

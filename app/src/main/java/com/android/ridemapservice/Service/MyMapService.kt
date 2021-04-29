@@ -10,7 +10,7 @@ import android.location.Location
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.android.ridemapservice.Common
+import com.android.ridemapservice.Utils.Common
 import com.android.ridemapservice.Model.MapLocation
 import com.android.ridemapservice.R
 import com.firebase.geofire.GeoFire
