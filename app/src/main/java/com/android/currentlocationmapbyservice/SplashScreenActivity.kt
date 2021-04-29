@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -15,9 +16,11 @@ import com.android.currentlocationmapbyservice.Model.DriverInfoModel
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.messaging.FirebaseMessaging
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
@@ -85,7 +88,23 @@ class SplashScreenActivity : AppCompatActivity() {
         listener = FirebaseAuth.AuthStateListener {
             val user = it.currentUser
             if (user != null) {
-//                Toast.makeText(this, user.phoneNumber, Toast.LENGTH_SHORT).show()
+
+                FirebaseMessaging.getInstance().token
+                        .addOnCompleteListener(OnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                Log.d(SplashScreenActivity::class.java.simpleName, "Fetching FCM registration token failed", task.exception)
+                                return@OnCompleteListener
+                            }
+
+                            // Get new FCM registration token
+                            val token = task.result
+                            Log.d("TOKEN", token ?: "")
+//                        UserUtils.updateToken(this, token ?: "")
+                        })
+                        .addOnFailureListener {
+                            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                        }
+
                 //todo 4 register
                 checkUserFromFirebase()
             } else {
