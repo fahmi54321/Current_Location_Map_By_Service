@@ -14,10 +14,15 @@ import android.preference.PreferenceManager
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.android.ridemapservice.Model.DriverGeoModel
+import com.android.ridemapservice.Model.DriverInfoModel
 import com.android.ridemapservice.Model.RiderInfoModel
 import com.android.ridemapservice.R
+import com.google.android.gms.maps.model.Marker
 import java.text.DateFormat
 import java.util.*
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 object Common {
     fun getLocationText(mLocation: Location?): String {
@@ -93,6 +98,10 @@ object Common {
         }
     }
 
+    val markerList: MutableMap<String,Marker> = HashMap<String,Marker>()
+    val DRIVER_INFO_REFERENCE: String = "DriverInfo"
+    val driversFound: MutableSet<DriverGeoModel> = HashSet<DriverGeoModel>()
+    val Driver_LOCATION_REFERENCE: String = "DriverLocations"
     val NOTIFICATION_CHANNEL_ID = "uber"
     fun showNotifications(
         context: Context,
@@ -138,4 +147,8 @@ object Common {
     var currentUser: RiderInfoModel? = null
     val RIDER_INFO_REFERENCE: String = "RiderInfo"
     val RIDER_LOCATION_REFERENCE: String = "RiderLocations"
+
+    fun buildName(firstName: String?, lastName: String?): String? {
+        return java.lang.StringBuilder(firstName).append(" ").append(lastName).toString()
+    }
 }
