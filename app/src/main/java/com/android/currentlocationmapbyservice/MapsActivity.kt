@@ -68,16 +68,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
     //todo 4 animation car
     val compositeDisposable = CompositeDisposable()
     private var iGoogleAPI: IGoogleAPI? = null
-    //Moving Marker
-    var polylineList:ArrayList<LatLng?>?=null
-    var handler:Handler?=null
-    var index:Int=0
-    var next:Int=0
-    var v:Float=0.0f
-    var lat:Double=0.0
-    var lng:Double=0.0
-    var start: LatLng?=null
-    var end: LatLng?=null
 
     override fun onStop() {
         compositeDisposable.clear()
