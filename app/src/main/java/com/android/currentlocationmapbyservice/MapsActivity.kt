@@ -1,6 +1,7 @@
 package com.android.currentlocationmapbyservice
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -10,9 +11,12 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,9 +24,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.android.currentlocationmapbyservice.Callback.FirebaseDriverInfoListener
 import com.android.currentlocationmapbyservice.Callback.FirebaseFailedListener
+import com.android.currentlocationmapbyservice.Model.AnimationModel
 import com.android.currentlocationmapbyservice.Model.DriverGeoModel
 import com.android.currentlocationmapbyservice.Model.DriverInfoModel
 import com.android.currentlocationmapbyservice.Model.GeoQueryModel
+import com.android.currentlocationmapbyservice.Remote.IGoogleAPI
+import com.android.currentlocationmapbyservice.Remote.RetrofitClient
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQueryEventListener
@@ -33,6 +40,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -45,14 +53,36 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONObject
 import java.io.IOException
+import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfoListener {
+
+    //todo 4 animation car
+    val compositeDisposable = CompositeDisposable()
+    private var iGoogleAPI: IGoogleAPI? = null
+    //Moving Marker
+    var polylineList:ArrayList<LatLng?>?=null
+    var handler:Handler?=null
+    var index:Int=0
+    var next:Int=0
+    var v:Float=0.0f
+    var lat:Double=0.0
+    var lng:Double=0.0
+    var start: LatLng?=null
+    var end: LatLng?=null
+
+    override fun onStop() {
+        compositeDisposable.clear()
+        super.onStop()
+    }
 
     private lateinit var mMap: GoogleMap
 
@@ -135,6 +165,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
     }
 
     private fun init() {
+
+        //todo 5 animation car
+        iGoogleAPI = RetrofitClient.intance?.create(IGoogleAPI::class.java)
 
         //todo 9 load all driver
         iFirebaseDriverInfoListener = this
@@ -546,8 +579,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
                                 val marker = Common.marketList.get(driverGeoModel?.key)
                                 marker?.remove()
                                 Common.marketList.remove(driverGeoModel?.key)
-
+                                Common.driversSubscribe.remove(driverGeoModel?.key) //todo 2 animation car
                                 driverLocations.removeEventListener(this)
+                            }
+                        }else{
+                            //todo 3 animation car
+                            if (Common.marketList.get(driverGeoModel?.key) != null) {
+                                val geoQueryModel = snapshot.getValue(GeoQueryModel::class.java)
+                                val animationModel = geoQueryModel?.let { AnimationModel(false, it) }
+                                if (Common.driversSubscribe.get(driverGeoModel?.key) != null) {
+                                    val marker = Common.marketList.get(driverGeoModel?.key)
+                                    val oldPosition = Common.driversSubscribe.get(driverGeoModel?.key)
+
+                                    val from = StringBuilder()
+                                        .append(oldPosition?.geoQueryModel?.l?.get(0))
+                                        .append(",")
+                                        .append(oldPosition?.geoQueryModel?.l?.get(1))
+                                        .toString()
+
+                                    val to = StringBuilder()
+                                        .append(animationModel?.geoQueryModel?.l?.get(0))
+                                        .append(",")
+                                        .append(animationModel?.geoQueryModel?.l?.get(1))
+                                        .toString()
+
+                                    moveMarkerAnimation(
+                                        driverGeoModel?.key ?: "",
+                                        animationModel,
+                                        marker,
+                                        from,
+                                        to
+                                    )
+                                } else {
+                                    animationModel?.let {
+                                        Common.driversSubscribe.put(
+                                            driverGeoModel?.key ?: "",
+                                            it
+                                        )
+                                    }  // first location init
+                                }
                             }
                         }
                     }
@@ -558,6 +628,83 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
 
                 })
             }
+        }
+    }
+
+    private fun moveMarkerAnimation(
+        key: String,
+        newData: AnimationModel?,
+        marker: Marker?,
+        from: String,
+        to: String
+    ) {
+        if (!newData?.isRun!!) {
+            //Request Api
+                compositeDisposable.add(iGoogleAPI?.getDirections("driving",
+                "less_driving",
+                from, to,
+                getString(R.string.google_maps_key))
+                    !!.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        Log.d("API_RETURN", it)
+                        try {
+                            val jsonObject = JSONObject(it)
+                            val jsonArray = jsonObject.getJSONArray("routes")
+                            for (i in 0 until jsonArray.length()) {
+                                val route = jsonArray.getJSONObject(i)
+                                val poly = route.getJSONObject("overview_polyline")
+                                val polyLine = poly.getString("points")
+                                polylineList = Common.decodePoly(polyLine)
+                            }
+
+                            //Moving
+                            handler = Handler()
+                            index = -1
+                            next = 1
+
+                            val runnable = object : Runnable {
+                                override fun run() {
+                                    if (polylineList != null && polylineList!!.size > 1) {
+                                        if (index < polylineList!!.size- 2) {
+                                            index++
+                                            next = index + 1
+                                            start = polylineList!![index]!!
+                                            end = polylineList!![next]!!
+                                        }
+                                        val valueAnimator = ValueAnimator.ofInt(0, 1)
+                                        valueAnimator.duration = 3000
+                                        valueAnimator.interpolator = LinearInterpolator()
+                                        valueAnimator.addUpdateListener {
+                                            v = it.animatedFraction
+                                            lat = v * end!!.latitude + (1 - v) * start!!.latitude
+                                            lng = v * end!!.longitude + (1 - v) * start!!.longitude
+                                            val newPos = LatLng(lat, lng)
+                                            marker!!.position = newPos
+                                            marker!!.setAnchor(0.5f, 0.5f)
+                                            marker!!.rotation = Common.getBearing(start!!, newPos)
+                                        }
+                                        valueAnimator.start()
+                                        if (index < polylineList!!.size - 2) {
+                                            handler!!.postDelayed(this, 1500)
+                                        } else if (index < polylineList!!.size-1) {
+                                            newData.isRun = false
+                                            Common.driversSubscribe.put(key, newData)
+                                        }
+                                    }
+                                }
+
+                            }
+                            handler!!.postDelayed(runnable, 1500)
+
+                        } catch (e: Exception) {
+                            Snackbar.make(mapFragment.requireView(), e.message
+                                ?: "", Snackbar.LENGTH_LONG).show()
+                        }
+                    },{
+                        Snackbar.make(mapFragment.requireView(), it.message
+                            ?: "", Snackbar.LENGTH_LONG).show()
+                    }))
         }
     }
 
