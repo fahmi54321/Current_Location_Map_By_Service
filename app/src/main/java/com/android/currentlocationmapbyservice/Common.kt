@@ -10,12 +10,17 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.util.Log
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import com.android.currentlocationmapbyservice.Model.AnimationModel
 import com.android.currentlocationmapbyservice.Model.DriverGeoModel
 import com.android.currentlocationmapbyservice.Model.DriverInfoModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 object Common {
     val driversSubscribe: MutableMap<String,AnimationModel> = HashMap<String,AnimationModel>()
@@ -94,6 +99,18 @@ object Common {
             return (90 - Math.toDegrees(Math.atan(lng / lat)) + 270).toFloat()
         return (-1).toFloat()
     }
+
+    fun setWelcomeMessage(txtWelcome: TextView) {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        if (hour>=1 && hour<=12){
+            txtWelcome.setText(java.lang.StringBuilder("Good Morning"))
+        }else if(hour>12 && hour<=17){
+            txtWelcome.setText(java.lang.StringBuilder("Good Afternoon"))
+        }else{
+            txtWelcome.setText(java.lang.StringBuilder("Good Evening"))
+        }
+    }
+
     //DECODE POLY
     fun decodePoly(encoded: String): ArrayList<LatLng?> {
         val poly = ArrayList<LatLng?>()
