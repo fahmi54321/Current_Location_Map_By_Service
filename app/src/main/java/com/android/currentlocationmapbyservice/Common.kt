@@ -11,15 +11,23 @@ import android.graphics.Color
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.android.currentlocationmapbyservice.Model.DriverGeoModel
 import com.android.currentlocationmapbyservice.Model.DriverInfoModel
+import com.google.android.gms.maps.model.Marker
 
 object Common {
+    val driverFound: MutableSet<DriverGeoModel> = HashSet<DriverGeoModel>()
     val TOKEN_REFERENCE: String = "Token"
     var currentUser: DriverInfoModel?=null
     val DRIVER_INFO_REFERENCE: String = "DriverInfo"
     val DRIVER_LOCATION_REFERENCE: String = "DriverLocations"
     val NOTIF_BODY: String = "body"
     val NOTIF_TITLE: String= "title"
+    val marketList: MutableMap<String, Marker> = HashMap()
+
+    fun buildName(firstName: String?, lastName: String?): String? {
+        return java.lang.StringBuilder(firstName).append(" ").append(lastName).toString()
+    }
 
     fun showNotification(
             context: Context,
