@@ -655,39 +655,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
                                 val route = jsonArray.getJSONObject(i)
                                 val poly = route.getJSONObject("overview_polyline")
                                 val polyLine = poly.getString("points")
-                                polylineList = Common.decodePoly(polyLine)
+                                newData.polylineList = Common.decodePoly(polyLine)
                             }
 
                             //Moving
-                            handler = Handler()
-                            index = -1
-                            next = 1
+                            newData.index = -1
+                            newData.next = 1
 
                             val runnable = object : Runnable {
                                 override fun run() {
-                                    if (polylineList != null && polylineList!!.size > 1) {
-                                        if (index < polylineList!!.size- 2) {
-                                            index++
-                                            next = index + 1
-                                            start = polylineList!![index]!!
-                                            end = polylineList!![next]!!
+                                    if (newData.polylineList != null && newData.polylineList!!.size > 1) {
+                                        if (newData.index < newData.polylineList!!.size- 2) {
+                                            newData.index++
+                                            newData.next = newData.index + 1
+                                            newData.start = newData.polylineList!![newData.index]!!
+                                            newData.end = newData.polylineList!![newData.next]!!
                                         }
                                         val valueAnimator = ValueAnimator.ofInt(0, 1)
                                         valueAnimator.duration = 3000
                                         valueAnimator.interpolator = LinearInterpolator()
                                         valueAnimator.addUpdateListener {
-                                            v = it.animatedFraction
-                                            lat = v * end!!.latitude + (1 - v) * start!!.latitude
-                                            lng = v * end!!.longitude + (1 - v) * start!!.longitude
-                                            val newPos = LatLng(lat, lng)
+                                            newData.v = it.animatedFraction
+                                            newData.lat = newData.v * newData.end!!.latitude + (1 - newData.v) * newData.start!!.latitude
+                                            newData.lng = newData.v * newData.end!!.longitude + (1 - newData.v) * newData.start!!.longitude
+                                            val newPos = LatLng(newData.lat, newData.lng)
                                             marker!!.position = newPos
                                             marker!!.setAnchor(0.5f, 0.5f)
-                                            marker!!.rotation = Common.getBearing(start!!, newPos)
+                                            marker!!.rotation = Common.getBearing(newData.start!!, newPos)
                                         }
                                         valueAnimator.start()
-                                        if (index < polylineList!!.size - 2) {
-                                            handler!!.postDelayed(this, 1500)
-                                        } else if (index < polylineList!!.size-1) {
+                                        if (newData.index < newData.polylineList!!.size - 2) {
+                                            newData.handler!!.postDelayed(this, 1500)
+                                        } else if (newData.index < newData.polylineList!!.size-1) {
                                             newData.isRun = false
                                             Common.driversSubscribe.put(key, newData)
                                         }
@@ -695,7 +694,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
                                 }
 
                             }
-                            handler!!.postDelayed(runnable, 1500)
+                            newData.handler!!.postDelayed(runnable, 1500)
 
                         } catch (e: Exception) {
                             Snackbar.make(mapFragment.requireView(), e.message
