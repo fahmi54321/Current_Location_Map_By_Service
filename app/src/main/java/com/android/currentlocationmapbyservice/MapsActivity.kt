@@ -5,6 +5,7 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -27,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.android.currentlocationmapbyservice.Callback.FirebaseDriverInfoListener
 import com.android.currentlocationmapbyservice.Callback.FirebaseFailedListener
+import com.android.currentlocationmapbyservice.EventBus.SelectPlaceEvent
 import com.android.currentlocationmapbyservice.Model.AnimationModel
 import com.android.currentlocationmapbyservice.Model.DriverGeoModel
 import com.android.currentlocationmapbyservice.Model.DriverInfoModel
@@ -64,6 +66,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import java.io.IOException
 import java.lang.Exception
@@ -190,8 +193,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
         ))
 
         autocompleteSupportFragment?.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(p0: Place) {
-                Toast.makeText(this@MapsActivity, ""+p0.latLng, Toast.LENGTH_SHORT).show()
+            override fun onPlaceSelected(place: Place) {
+                //todo 2 estimate_routes(next RequestDriverActivity)
+                if (ContextCompat.checkSelfPermission(
+                                this@MapsActivity,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    //Location Permission already granted
+                    Toast.makeText(this@MapsActivity, "Permission granted", Toast.LENGTH_SHORT).show()
+                } else {
+                    //Request Location Permission
+                    checkLocationPermission()
+                }
+                fusedLocationProviderClient?.lastLocation?.addOnSuccessListener {
+                    val origin = LatLng(it.latitude,it.longitude)
+                    val destination = LatLng(place.latLng?.latitude?:0.0,place.latLng?.longitude?:0.0)
+
+                    startActivity(Intent(this@MapsActivity,RequestDriverActivity::class.java))
+                    EventBus.getDefault().postSticky(SelectPlaceEvent(origin,destination))
+                }
             }
 
             override fun onError(p0: Status) {

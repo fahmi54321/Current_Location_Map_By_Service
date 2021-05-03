@@ -144,4 +144,17 @@ object Common {
         }
         return poly
     }
+
+    fun formatDuration(duration: String): CharSequence? {
+        if (duration.contains("mins")){
+            return duration.substring(0,duration.length-1)
+        }else{
+            return duration
+        }
+    }
+
+    fun formatAddress(startAddress: String): CharSequence? {
+        val firstIndextComma = startAddress.indexOf(",")
+        return startAddress.substring(0,firstIndextComma)
+    }
 }

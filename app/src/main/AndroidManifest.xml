@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.currentlocationmapbyservice">
+
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -9,7 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"></uses-permission>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <!--
  Required only when requesting background location access on
        Android 10 (API level 29) and higher.
@@ -24,18 +25,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CurrentLocationMapByService">
 
-<!--        todo 2 splashscreen-->
-        <activity
-            android:name=".SplashScreenActivity"
-            android:theme="@style/SplashTheme">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -49,10 +38,22 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:name=".RequestDriverActivity"
+            android:label="@string/title_activity_request_driver"></activity>
+        <!-- todo 2 splashscreen -->
+        <activity
+            android:name=".SplashScreenActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps" />
+        <activity android:name=".MainActivity" />
 
         <service
             android:name=".Service.MyFirebaseMessagingService"

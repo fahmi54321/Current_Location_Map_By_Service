@@ -72,6 +72,10 @@ dependencies {
     implementation 'com.google.android.libraries.places:places:2.4.0'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
+    //todo 1 estimate_routes(next MapsActivity)
+    implementation 'org.greenrobot:eventbus:3.2.0'
+    implementation 'com.google.maps.android:android-maps-utils-v3:2.0.3'
+
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
