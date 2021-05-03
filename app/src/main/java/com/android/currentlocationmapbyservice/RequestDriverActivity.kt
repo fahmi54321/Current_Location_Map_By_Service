@@ -97,7 +97,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        //todo 4 estimate_routes
+        //todo 4 estimate_routes (finish)
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
