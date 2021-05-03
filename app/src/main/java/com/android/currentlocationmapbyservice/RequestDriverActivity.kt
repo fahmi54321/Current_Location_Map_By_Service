@@ -220,7 +220,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         animator?.start()
 
-//        todo 8 Find Nearby Driver
+//        todo 8 Find Nearby Driver (finish)
         findNearbyDriver(target)
     }
 
