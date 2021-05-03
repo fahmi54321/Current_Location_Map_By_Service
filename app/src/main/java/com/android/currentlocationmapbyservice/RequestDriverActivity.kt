@@ -32,6 +32,9 @@ import com.google.maps.android.ui.IconGenerator
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.layout_confirm_pickup.*
+import kotlinx.android.synthetic.main.layout_confirm_uber.*
+import kotlinx.android.synthetic.main.origin_info_windows.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -92,40 +95,38 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun init() {
         iGoogleApi = RetrofitClient.intance?.create(IGoogleAPI::class.java)
+
+//      todo 2 confirm_uber
+        btn_confirm_uber.setOnClickListener {
+            confirm_pickup_layout.visibility = View.VISIBLE
+            confirm_uber_layout.visibility = View.GONE
+            setDataPickup()
+        }
+    }
+
+    private fun setDataPickup() {
+        txt_address_pickup.text = if (txt_origin != null) txt_origin.text else "None"
+        mMap.clear()
+        addPickupMarker()
+    }
+
+    private fun addPickupMarker() {
+        val view = layoutInflater.inflate(R.layout.pickup_info_windows, null)
+        val generator = IconGenerator(this)
+        generator.setContentView(view)
+        generator.setBackground(ColorDrawable(Color.TRANSPARENT))
+        val icon = generator.makeIcon()
+
+        originMarker = mMap.addMarker(
+            MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromBitmap(icon))
+                .position(selectPlaceEvent?.origin!!)
+        )
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        //todo 4 estimate_routes
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            //Location Permission already granted
-            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show()
-        } else {
-            //Request Location Permission
-            checkLocationPermission()
-        }
-        mMap.isMyLocationEnabled = true
-        mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.setOnMyLocationClickListener {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectPlaceEvent?.origin, 18f))
-            true
-        }
-
-        drawPath(selectPlaceEvent)
-
-        val locationButton = (mapFragment.requireView()
-            .findViewById<View>("1".toInt()).parent as View)
-            .findViewById<View>("2".toInt())
-        val params = locationButton.layoutParams as RelativeLayout.LayoutParams
-        params.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-        params.bottomMargin = 250
-        mMap.uiSettings.isZoomControlsEnabled = true
         try {
             val success = googleMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(

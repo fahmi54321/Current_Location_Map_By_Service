@@ -120,7 +120,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
     private lateinit var onlineRef:DatabaseReference
     private var currentUserRef:DatabaseReference?=null
     private lateinit var driverLocationRef: DatabaseReference
-    private lateinit var geoFire: GeoFire
+    private var geoFire: GeoFire?=null
     private var onlineValueEventListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             if (snapshot.exists() && currentUserRef != null) {
@@ -140,7 +140,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
         fusedLocationProviderClient?.removeLocationUpdates(locationCallback)
 
         //todo 11
-        geoFire.removeLocation(FirebaseAuth.getInstance().currentUser?.uid)
+        geoFire?.removeLocation(FirebaseAuth.getInstance().currentUser?.uid)
         onlineRef.removeEventListener(onlineValueEventListener)
 
         super.onDestroy()
