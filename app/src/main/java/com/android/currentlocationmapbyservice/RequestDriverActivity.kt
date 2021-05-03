@@ -43,6 +43,7 @@ import java.lang.Exception
 
 class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private lateinit var txt_origin:TextView
     private lateinit var mMap: GoogleMap
     private lateinit var mapFragment:SupportMapFragment
     companion object {
@@ -97,7 +98,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun init() {
         iGoogleApi = RetrofitClient.intance?.create(IGoogleAPI::class.java)
 
-//      todo 2 confirm_uber
+//      todo 2 confirm_uber (finish)
         btn_confirm_uber.setOnClickListener {
             confirm_pickup_layout.visibility = View.VISIBLE
             confirm_uber_layout.visibility = View.GONE
@@ -256,7 +257,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addOriginMarker(duration: String, startAddress: String) {
         val view = layoutInflater.inflate(R.layout.origin_info_windows, null)
         val txt_time = view.findViewById<View>(R.id.txt_time) as TextView
-        val txt_origin = view.findViewById<View>(R.id.txt_origin) as TextView
+        txt_origin = view.findViewById<View>(R.id.txt_origin) as TextView
 
         txt_time.text = Common.formatDuration(duration)
         txt_origin.text = Common.formatAddress(startAddress)
