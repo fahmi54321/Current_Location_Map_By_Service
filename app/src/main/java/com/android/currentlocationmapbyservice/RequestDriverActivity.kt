@@ -83,13 +83,14 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request_driver)
+
+        //todo 3 estimate_routes
+        init()
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-        //todo 3 estimate_routes
-        init()
 
     }
 
@@ -126,6 +127,9 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+
+        drawPath(selectPlaceEvent)
 
         try {
             val success = googleMap.setMapStyle(
