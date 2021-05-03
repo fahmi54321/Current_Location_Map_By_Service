@@ -41,10 +41,13 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONObject
+import org.w3c.dom.Text
 import java.lang.Exception
 
 class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
+
+    private lateinit var txt_origin:TextView
 
     //Spinning animation
     private var animator: ValueAnimator? = null
@@ -188,7 +191,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         //Start rotating camera
         startMapCameraSpinningAnimation(mMap.cameraPosition.target)
     }
-    //      todo 5 confirm_pickup_spot
+    //      todo 5 confirm_pickup_spot (finish)
     private fun startMapCameraSpinningAnimation(target: LatLng?) {
         if (animator != null) animator?.cancel()
         animator = ValueAnimator.ofFloat(0f, (DESIRED_NUM_OF_SPINS.times(360).toFloat()))
@@ -370,7 +373,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addOriginMarker(duration: String, startAddress: String) {
         val view = layoutInflater.inflate(R.layout.origin_info_windows, null)
         val txt_time = view.findViewById<View>(R.id.txt_time) as TextView
-        val txt_origin = view.findViewById<View>(R.id.txt_origin) as TextView
+        txt_origin = view.findViewById<View>(R.id.txt_origin) as TextView
 
         txt_time.text = Common.formatDuration(duration)
         txt_origin.text = Common.formatAddress(startAddress)
