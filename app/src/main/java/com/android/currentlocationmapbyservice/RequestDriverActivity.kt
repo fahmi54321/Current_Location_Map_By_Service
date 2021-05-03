@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +20,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.android.currentlocationmapbyservice.EventBus.SelectPlaceEvent
+import com.android.currentlocationmapbyservice.Model.DriverGeoModel
 import com.android.currentlocationmapbyservice.Remote.IGoogleAPI
 import com.android.currentlocationmapbyservice.Remote.RetrofitClient
 
@@ -45,6 +47,7 @@ import java.lang.Exception
 
 class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private lateinit var txt_origin:TextView
 
     //Spinning animation
     private var animator: ValueAnimator? = null
@@ -57,13 +60,15 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private var lastPulseAnimator: ValueAnimator? = null
 
     private lateinit var mMap: GoogleMap
-    private lateinit var mapFragment:SupportMapFragment
+    private lateinit var mapFragment: SupportMapFragment
+
     companion object {
         val MY_PERMISSIONS_REQUEST_LOCATION = 99
     }
 
     //todo 3 estimate_routes
-    private var selectPlaceEvent:SelectPlaceEvent?=null
+    private var selectPlaceEvent: SelectPlaceEvent? = null
+
     //routes
     private val compositeDisposable = CompositeDisposable()
     private var iGoogleApi: IGoogleAPI? = null
@@ -75,21 +80,23 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
     private var originMarker: Marker? = null
     private var destinationMarker: Marker? = null
     override fun onStart() {
-        if (!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
         }
         super.onStart()
     }
+
     override fun onStop() {
         compositeDisposable.clear()
-        if (EventBus.getDefault().hasSubscriberForEvent(SelectPlaceEvent::class.java)){
+        if (EventBus.getDefault().hasSubscriberForEvent(SelectPlaceEvent::class.java)) {
             EventBus.getDefault().removeStickyEvent(SelectPlaceEvent::class.java)
         }
         EventBus.getDefault().unregister(this)
         super.onStop()
     }
-    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
-    fun onSelectePlaceEvent(event:SelectPlaceEvent){
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun onSelectePlaceEvent(event: SelectPlaceEvent) {
         selectPlaceEvent = event
     }
 
@@ -153,6 +160,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
 
         addPulsatingEffect(selectPlaceEvent?.origin)
     }
+
     //      todo 4 confirm_pickup_spot
     private fun addPulsatingEffect(origin: LatLng?) {
         if (lastPulseAnimator != null) {
@@ -188,6 +196,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
         //Start rotating camera
         startMapCameraSpinningAnimation(mMap.cameraPosition.target)
     }
+
     //      todo 5 confirm_pickup_spot
     private fun startMapCameraSpinningAnimation(target: LatLng?) {
         if (animator != null) animator?.cancel()
@@ -210,10 +219,44 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
         animator?.start()
+
+//        todo 8 Find Nearby Driver
+        findNearbyDriver(target)
+    }
+
+    fun findNearbyDriver(target: LatLng?) {
+        if (Common.driverFound.size > 0) {
+            var main = 0f
+            var foundDrivers = Common.driverFound[Common.driverFound.keys.iterator().next()]
+            var currentRiderLocation = Location("")
+            currentRiderLocation.latitude = target?.latitude ?: 0.0
+            currentRiderLocation.longitude = target?.longitude ?: 0.0
+
+            for (key in Common.driverFound.keys) {
+                var driverLocation = Location("")
+                driverLocation.latitude = Common.driverFound[key]?.geoLocation?.latitude ?: 0.0
+                driverLocation.longitude = Common.driverFound[key]?.geoLocation?.longitude ?: 0.0
+
+                if (main == 0f) {
+                    main = driverLocation.distanceTo(currentRiderLocation)
+                    foundDrivers = Common.driverFound[key]
+                } else if (driverLocation.distanceTo(currentRiderLocation) < main) {
+                    main = driverLocation.distanceTo(currentRiderLocation)
+                    foundDrivers = Common.driverFound[key]
+                }
+            }
+            Snackbar.make(
+                main_layout, StringBuilder("Found Driver: ")
+                    .append(foundDrivers?.driverInfoModel?.phoneNumber), Snackbar.LENGTH_LONG
+            ).show()
+        } else {
+            Snackbar.make(main_layout, getString(R.string.driver_not_found), Snackbar.LENGTH_LONG)
+                .show()
+        }
     }
 
     override fun onDestroy() {
-        if (animator!=null){
+        if (animator != null) {
             animator?.end()
         }
         super.onDestroy()
@@ -352,6 +395,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
                 })
         )
     }
+
     private fun addDestinationMarker(endAddress: String) {
         val view = layoutInflater.inflate(R.layout.destination_info_windows, null)
         val txt_destination = view.findViewById<View>(R.id.txt_destination) as TextView
@@ -367,10 +411,11 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
                 .position(selectPlaceEvent?.destination!!)
         )
     }
+
     private fun addOriginMarker(duration: String, startAddress: String) {
         val view = layoutInflater.inflate(R.layout.origin_info_windows, null)
         val txt_time = view.findViewById<View>(R.id.txt_time) as TextView
-        val txt_origin = view.findViewById<View>(R.id.txt_origin) as TextView
+        txt_origin = view.findViewById<View>(R.id.txt_origin) as TextView
 
         txt_time.text = Common.formatDuration(duration)
         txt_origin.text = Common.formatAddress(startAddress)
@@ -385,6 +430,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
                 .position(selectPlaceEvent?.origin!!)
         )
     }
+
     private fun checkLocationPermission() {
 
 
@@ -436,6 +482,7 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
             )
         }
     }
+
     private fun Context.checkSinglePermission(permission: String): Boolean {
         return ContextCompat.checkSelfPermission(
             this,

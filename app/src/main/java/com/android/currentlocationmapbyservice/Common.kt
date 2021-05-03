@@ -25,7 +25,7 @@ import kotlin.collections.HashSet
 
 object Common {
     val driversSubscribe: MutableMap<String,AnimationModel> = HashMap<String,AnimationModel>()
-    val driverFound: MutableSet<DriverGeoModel> = HashSet<DriverGeoModel>()
+    val driverFound: MutableMap<String,DriverGeoModel> = HashMap<String,DriverGeoModel>() //todo 1 Find Nearby Driver(next MapsActivity)
     val TOKEN_REFERENCE: String = "Token"
     var currentUser: DriverInfoModel?=null
     val DRIVER_INFO_REFERENCE: String = "DriverInfo"

@@ -77,6 +77,9 @@ import kotlin.collections.ArrayList
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfoListener {
 
+
+    //todo 2 Find Nearby Driver(perbaiki Common.driversFound)
+
 //    todo 2 interated google places
     private lateinit var slidingUpPanelLayout:SlidingUpPanelLayout
     private lateinit var txt_welcome:TextView
@@ -359,7 +362,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
                         geoQuery.removeAllListeners()
                         geoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
                             override fun onKeyEntered(key: String?, location: GeoLocation?) {
-                                Common.driverFound.add(DriverGeoModel(key, location))
+//                                Common.driverFound.add(DriverGeoModel(key, location))
+                                //todo 3 Find Nearby Driver
+                                if (!Common.driverFound.containsKey(key)){
+                                    Common.driverFound[key?:""] = DriverGeoModel(key,location)
+                                }
                             }
 
                             override fun onKeyExited(key: String?) {
@@ -445,11 +452,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
     private fun addDriverMarker() {
 
         if (Common.driverFound.size > 0) {
-            Observable.fromIterable(Common.driverFound)
+
+            //todo 4 Find Nearby Driver
+            Observable.fromIterable(Common.driverFound.keys)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ driverGeoModel: DriverGeoModel? ->
-                    findDriverByKey(driverGeoModel)
+                .subscribe({ key: String? -> //todo 5 Find Nearby Driver
+                    findDriverByKey(Common.driverFound[key]) //todo 6 Find Nearby Driver
                 }, {
                     Snackbar.make(mapFragment.requireView(), it.message ?: "", Snackbar.LENGTH_SHORT).show()
                 })
@@ -468,6 +477,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.hasChildren()) {
                         it?.driverInfoModel = (snapshot.getValue(DriverInfoModel::class.java))
+                        Common.driverFound[it?.key]?.driverInfoModel = (snapshot.getValue(DriverInfoModel::class.java)) //todo 7 Find Nearby Driver (next RequestDriverActivity)
                         iFirebaseDriverInfoListener.onDriverInfoLoadSuccess(it)
                     } else {
                         iFirebaseFailedListener.onFirebaseFailed(getString(R.string.key_not_founds) + it?.key)
