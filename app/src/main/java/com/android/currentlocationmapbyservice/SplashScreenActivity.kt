@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.android.currentlocationmapbyservice.Model.DriverInfoModel
+import com.android.currentlocationmapbyservice.Utils.UserUtils
 import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -99,7 +100,7 @@ class SplashScreenActivity : AppCompatActivity() {
                             // Get new FCM registration token
                             val token = task.result
                             Log.d("TOKEN", token ?: "")
-//                        UserUtils.updateToken(this, token ?: "")
+                        UserUtils.updateToken(this, token ?: "")
                         })
                         .addOnFailureListener {
                             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()

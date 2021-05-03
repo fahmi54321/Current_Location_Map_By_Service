@@ -24,6 +24,8 @@ import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 object Common {
+    val PICKUP_LOCATION: String = "PickupLocation"
+    val REQUEST_DRIVER_TITLE: String ="RequestDriver"
     val driversSubscribe: MutableMap<String,AnimationModel> = HashMap<String,AnimationModel>()
     val driverFound: MutableMap<String,DriverGeoModel> = HashMap<String,DriverGeoModel>() //todo 1 Find Nearby Driver(next MapsActivity)
     val TOKEN_REFERENCE: String = "Token"

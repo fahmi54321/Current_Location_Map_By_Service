@@ -23,6 +23,7 @@ import com.android.currentlocationmapbyservice.EventBus.SelectPlaceEvent
 import com.android.currentlocationmapbyservice.Model.DriverGeoModel
 import com.android.currentlocationmapbyservice.Remote.IGoogleAPI
 import com.android.currentlocationmapbyservice.Remote.RetrofitClient
+import com.android.currentlocationmapbyservice.Utils.UserUtils
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -249,6 +250,10 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
                 main_layout, StringBuilder("Found Driver: ")
                     .append(foundDrivers?.driverInfoModel?.phoneNumber), Snackbar.LENGTH_LONG
             ).show()
+
+            //todo 1 notif request driver
+            UserUtils.sendRequestToDriver(this,main_layout,foundDrivers,target)
+
         } else {
             Snackbar.make(main_layout, getString(R.string.driver_not_found), Snackbar.LENGTH_LONG)
                 .show()
