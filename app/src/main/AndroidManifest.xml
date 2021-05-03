@@ -38,6 +38,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:name=".RequestDriverActivity"
             android:label="@string/title_activity_request_driver"></activity>
         <!-- todo 2 splashscreen -->

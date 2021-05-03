@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--todo 1 confirm_uber(RequestDriverActivity)-->
+<!--todo 1 confirm_pickup_spot(RequestDriverActivity)-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -34,6 +35,7 @@
         android:layout_alignParentBottom="true">
         <include layout="@layout/layout_confirm_uber"></include>
         <include layout="@layout/layout_confirm_pickup"></include>
+        <include layout="@layout/layout_finding_your_driver"></include>
 
     </FrameLayout>
 

@@ -1,5 +1,6 @@
 package com.android.currentlocationmapbyservice
 
+import android.animation.ValueAnimator
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -156,5 +157,16 @@ object Common {
     fun formatAddress(startAddress: String): CharSequence? {
         val firstIndextComma = startAddress.indexOf(",")
         return startAddress.substring(0,firstIndextComma)
+    }
+
+    fun valueAnimate(duration: Int, listener: ValueAnimator.AnimatorUpdateListener?): ValueAnimator {
+        val va = ValueAnimator.ofFloat(0f,100f)
+        va.duration = duration.toLong()
+        va.addUpdateListener (listener)
+        va.repeatCount = ValueAnimator.INFINITE
+        va.repeatMode = ValueAnimator.RESTART
+        va.start()
+
+        return va
     }
 }

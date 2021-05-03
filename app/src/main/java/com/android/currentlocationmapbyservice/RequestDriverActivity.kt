@@ -32,8 +32,10 @@ import com.google.maps.android.ui.IconGenerator
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_request_driver.*
 import kotlinx.android.synthetic.main.layout_confirm_pickup.*
 import kotlinx.android.synthetic.main.layout_confirm_uber.*
+import kotlinx.android.synthetic.main.layout_finding_your_driver.*
 import kotlinx.android.synthetic.main.origin_info_windows.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -42,6 +44,17 @@ import org.json.JSONObject
 import java.lang.Exception
 
 class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
+
+
+    //Spinning animation
+    private var animator: ValueAnimator? = null
+    private val DESIRED_NUM_OF_SPINS = 5
+    private val DESIRED_SECONDS_PER_ONE_FULL_360_SPIN = 40
+
+    //effect
+    private var lastUserCircle: Circle? = null
+    val duration = 1000
+    private var lastPulseAnimator: ValueAnimator? = null
 
     private lateinit var mMap: GoogleMap
     private lateinit var mapFragment:SupportMapFragment
@@ -103,6 +116,107 @@ class RequestDriverActivity : AppCompatActivity(), OnMapReadyCallback {
             confirm_uber_layout.visibility = View.GONE
             setDataPickup()
         }
+
+//      todo 2 confirm_pickup_spot
+        btn_confirm_uber_pickup.setOnClickListener {
+            if (mMap == null) {
+                return@setOnClickListener
+            }
+            if (selectPlaceEvent == null) {
+                return@setOnClickListener
+            }
+
+            //clear map
+            mMap.clear()
+
+            //Tilt
+            val cameraPos = CameraPosition.Builder().target(selectPlaceEvent?.origin)
+                .tilt(45f)
+                .zoom(16f)
+                .build()
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos))
+
+            //start animation
+            addMarkerWithPulseAnimation()
+        }
+    }
+
+    //      todo 3 confirm_pickup_spot
+    private fun addMarkerWithPulseAnimation() {
+        confirm_pickup_layout.visibility = View.GONE
+        fill_maps.visibility = View.VISIBLE
+        finding_you_ride_layout.visibility = View.VISIBLE
+        originMarker = mMap.addMarker(
+            MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker())
+                .position(selectPlaceEvent?.origin!!)
+        )
+
+        addPulsatingEffect(selectPlaceEvent?.origin)
+    }
+    //      todo 4 confirm_pickup_spot
+    private fun addPulsatingEffect(origin: LatLng?) {
+        if (lastPulseAnimator != null) {
+            lastPulseAnimator?.cancel()
+        }
+        if (lastUserCircle != null) {
+            lastUserCircle?.center = origin
+        }
+
+        lastPulseAnimator =
+            Common.valueAnimate(duration, object : ValueAnimator.AnimatorUpdateListener {
+                override fun onAnimationUpdate(p0: ValueAnimator?) {
+                    if (lastUserCircle != null) {
+                        lastUserCircle?.radius = p0?.animatedValue.toString().toDouble()
+                    } else {
+                        lastUserCircle = mMap.addCircle(
+                            CircleOptions()
+                                .center(origin)
+                                .radius(p0?.animatedValue.toString().toDouble())
+                                .strokeColor(Color.WHITE)
+                                .fillColor(
+                                    ContextCompat.getColor(
+                                        this@RequestDriverActivity,
+                                        R.color.teal_700
+                                    )
+                                )
+                        )
+                    }
+                }
+
+            })
+
+        //Start rotating camera
+        startMapCameraSpinningAnimation(mMap.cameraPosition.target)
+    }
+    //      todo 5 confirm_pickup_spot
+    private fun startMapCameraSpinningAnimation(target: LatLng?) {
+        if (animator != null) animator?.cancel()
+        animator = ValueAnimator.ofFloat(0f, (DESIRED_NUM_OF_SPINS.times(360).toFloat()))
+        animator?.duration =
+            (DESIRED_NUM_OF_SPINS.times(DESIRED_SECONDS_PER_ONE_FULL_360_SPIN).times(1000).toLong())
+        animator?.interpolator = LinearInterpolator()
+        animator?.startDelay = (100)
+        animator?.addUpdateListener {
+            val newBearingValue = it.animatedValue as Float
+            mMap.moveCamera(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.Builder()
+                        .target(target)
+                        .zoom(16f)
+                        .tilt(45f)
+                        .bearing(newBearingValue)
+                        .build()
+                )
+            )
+        }
+        animator?.start()
+    }
+
+    override fun onDestroy() {
+        if (animator!=null){
+            animator?.end()
+        }
+        super.onDestroy()
     }
 
     private fun setDataPickup() {
