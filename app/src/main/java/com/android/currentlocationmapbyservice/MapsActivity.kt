@@ -320,7 +320,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, FirebaseDriverInfo
                 try {
                     addressList = geoCoder.getFromLocation(location.latitude,location.longitude,1)
 
-                    //todo 5 interated google places
+                    //todo 5 interated google places (finish)
                     if (addressList.size>0){
                         cityName = addressList[0].locality
                     }
